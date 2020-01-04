@@ -1,0 +1,161 @@
+#Space Invaders.
+#Python 3.6.2 on Windows 10.
+import turtle
+import math
+
+#Setting Up Screen.
+wn = turtle.Screen()
+wn.bgcolor("black")
+wn.title("Space Invaders")
+
+
+#Drawing Border.
+border_pen = turtle.Turtle()
+border_pen.speed(0)
+border_pen.color("White")
+border_pen.penup()
+border_pen.setposition(-300,-300)
+border_pen.pendown()
+border_pen.pensize(2)
+for side in range (4):
+    border_pen.fd(600)
+    border_pen.lt(90)
+border_pen.hideturtle()
+
+#Creating Player.
+player = turtle.Turtle()
+player.color("green")
+player.shape("triangle")
+player.penup()
+player.speed(0)
+player.setposition(0,-250)
+player.setheading(90)
+
+playerspeed = 15
+
+#Creating Player's Weapon.
+bullet = turtle.Turtle()
+bullet.color("yellow")
+bullet.shape("triangle")
+bullet.penup()
+bullet.speed(0)
+bullet.setheading(90)
+bullet.shapesize(0.4, 0.4)
+bullet.hideturtle()
+
+bulletspeed = 20
+
+#Bullet State.
+#ready - ready to fire.
+#fire - bullet if firing.
+bulletstate = "ready"
+
+
+#Creating Enemy.
+enemy = turtle.Turtle()
+enemy.color("red")
+enemy.shape("circle")
+enemy.penup()
+enemy.speed(0)
+enemy.setposition(-200, 250)
+
+enemyspeed = 2
+
+
+#Moving Up & Down, Left & Right.
+def move_left():
+    x = player.xcor()
+    x -= playerspeed
+    if x < -280:
+        x = -280
+    player.setx(x)
+
+def move_right():
+    x = player.xcor()
+    x +=playerspeed
+    if x > 280:
+        x = 280
+    player.setx(x)
+
+def move_up():
+    y = player.ycor()
+    y += playerspeed
+    if y > -100:
+        y = -100
+    player.sety(y)
+
+def move_down():
+    y = player.ycor ()
+    y -= playerspeed
+    if y < -280:
+        y = -280
+    player.sety(y)
+
+def fire_bullet():
+    #Declare 'bulletstate' as global if needs changing.
+    global bulletstate
+    if bulletstate == "ready":
+        bulletstate  = "fire"
+        #Move the bullet above the player.
+        x = player.xcor()
+        y = player.ycor() + 10
+        bullet.setposition(x, y)
+        bullet.showturtle()
+
+def isCollision(t1, t2):
+    distance = math.sqrt(math.pow(t1.xcor()-t2.xcor(),2))+(math.pow(t1.ycor()-t2.ycor(),2))
+    if distance < 25:
+        return True
+    else:
+        return False
+
+
+#Keyboard Bindings.
+turtle.listen()
+turtle.onkey(move_left, "Left")
+turtle.onkey(move_right, "Right")
+turtle.onkey(move_up, "Up")
+turtle.onkey(move_down, "Down")
+turtle.onkey(fire_bullet, "space")
+
+#Main Game Loop.
+while True:
+
+    #Moving Enemies
+    x = enemy.xcor()
+    x += enemyspeed
+    enemy.setx(x)
+
+    #Moving Enemies back and forward.
+    if enemy.xcor() > 280:
+        y = enemy.ycor()
+        y -= 15
+        enemyspeed *= -1
+        enemy.sety(y)
+
+
+    if enemy.xcor() < -280:
+        y = enemy.ycor()
+        y += -15
+        enemyspeed *= -1
+        enemy.sety(y)
+
+    #Moving the Bullet.
+    y = bullet.ycor()
+    y += bulletspeed
+    bullet.sety(y)
+    if bullet.ycor() > 300:
+        bullet.hideturtle()
+        bulletstate = "ready"
+
+    #Checking for Collision with Enemies.
+    if isCollision(bullet, enemy):
+        #Reset Bullet.
+        bullet.hideturtle()
+        bulletstate = "ready"
+        bullet.setposition(0, -400)
+        #Rest Enemy.
+        enemy.setposition(-200, 250)
+
+wn=turtle.mainloop()
+delay = input("Press Enter key to close.")
